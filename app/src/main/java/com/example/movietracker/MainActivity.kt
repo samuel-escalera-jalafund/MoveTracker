@@ -12,7 +12,6 @@ import com.example.movietracker.ui.MovieAdapter
 import com.example.movietracker.ui.MovieViewModel
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
