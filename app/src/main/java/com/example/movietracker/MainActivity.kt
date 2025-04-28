@@ -1,12 +1,13 @@
 package com.example.movietracker
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.SearchView
-import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.movietracker.databinding.ActivityMainBinding
+import com.example.movietracker.ui.DetailActivity
 import com.example.movietracker.ui.MovieAdapter
 import com.example.movietracker.ui.MovieViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,7 +33,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         adapter = MovieAdapter(emptyList()) { movie ->
-            Toast.makeText(this, "Selected: ${movie.title}", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, DetailActivity::class.java).apply {
+                putExtra("MOVIE_ID", movie.id)
+            }
+            startActivity(intent)
         }
         binding.moviesRecyclerView.adapter = adapter
     }
@@ -47,7 +51,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Implementación opcional para búsqueda en tiempo real
                 newText?.let { viewModel.searchMovies(it) }
                 return false
             }
@@ -57,9 +60,7 @@ class MainActivity : AppCompatActivity() {
     private fun observeViewModel() {
         lifecycleScope.launch {
             viewModel.searchResults.observe(this@MainActivity) { movies ->
-                adapter = MovieAdapter(movies) { movie ->
-                }
-                binding.moviesRecyclerView.adapter = adapter
+                adapter.updateMovies(movies)
             }
 
             viewModel.favoriteMovies.collectLatest { favorites ->

@@ -36,4 +36,15 @@ fun Movie.toEntity(): MovieEntity {
     )
 }
 
+fun MovieDto.toDomain(): Movie {
+    return Movie(
+        id = this.id,
+        title = this.title,
+        year = this.year,
+        imageUrl = this.imageUrl,
+        isFavorite = false,
+        isWatched = false
+    )
+}
+
 fun List<MovieEntity>.toDomainList(): List<Movie> = this.map { it.toDomain() }

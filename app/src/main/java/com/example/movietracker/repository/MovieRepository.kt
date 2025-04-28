@@ -27,4 +27,8 @@ class MovieRepository @Inject constructor(
             movie.toEntity().copy(isFavorite = !movie.isFavorite)
         )
     }
+
+    suspend fun getMovieDetails(movieId: Int): Movie {
+        return apiService.getMovieDetails(movieId).toDomain()
+    }
 }

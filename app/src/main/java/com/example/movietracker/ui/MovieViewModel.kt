@@ -15,8 +15,12 @@ import javax.inject.Inject
 class MovieViewModel @Inject constructor(
     private val repository: MovieRepository
 ) : ViewModel() {
+
     private val _searchResults = MutableLiveData<List<Movie>>()
     val searchResults: LiveData<List<Movie>> = _searchResults
+
+    private val _movieDetails = MutableLiveData<Movie?>()
+    val movieDetails: LiveData<Movie?> = _movieDetails
 
     fun searchMovies(query: String) {
         viewModelScope.launch {
@@ -25,4 +29,15 @@ class MovieViewModel @Inject constructor(
     }
 
     val favoriteMovies: Flow<List<Movie>> = repository.getFavoriteMovies()
+
+    fun getMovieDetails(movieId: Int) {
+        viewModelScope.launch {
+            try {
+                val details = repository.getMovieDetails(movieId)
+                _movieDetails.value = details
+            } catch (e: Exception) {
+                _movieDetails.value = null
+            }
+        }
+    }
 }
