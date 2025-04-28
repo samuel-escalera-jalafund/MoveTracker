@@ -35,4 +35,9 @@ class MovieRepository @Inject constructor(
     suspend fun getMovieById(movieId: Int): MovieEntity? {
         return movieDao.getMovieById(movieId)
     }
+
+    suspend fun toggleWatched(movie: Movie) {
+        val movieEntity = movie.toEntity().copy(isWatched = !movie.isWatched)
+        movieDao.insertMovie(movieEntity)
+    }
 }

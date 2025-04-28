@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.example.movietracker.R
 import com.example.movietracker.databinding.ActivityDetailBinding
 import com.example.movietracker.model.Movie
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,6 +43,24 @@ class DetailActivity : AppCompatActivity() {
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             }
         }
+
+        binding.favoriteButton.setOnClickListener {
+            currentMovie?.let { movie ->
+                viewModel.toggleFavorite(movie)
+                currentMovie = movie.copy(isFavorite = !movie.isFavorite)
+                updateButtons()
+                showFavoriteMessage()
+            }
+        }
+
+        binding.watchedButton.setOnClickListener {
+            currentMovie?.let { movie ->
+                viewModel.toggleWatched(movie)
+                currentMovie = movie.copy(isWatched = !movie.isWatched)
+                updateButtons()
+                showWatchedMessage()
+            }
+        }
     }
 
     private fun observeViewModel() {
@@ -52,6 +71,40 @@ class DetailActivity : AppCompatActivity() {
                 updateFavoriteButton()
             }
         }
+    }
+
+    private fun updateButtons() {
+        currentMovie?.let { movie ->
+            binding.favoriteButton.text = if (movie.isFavorite) {
+                getString(R.string.remove_from_favorites)
+            } else {
+                getString(R.string.add_to_favorites)
+            }
+
+            binding.watchedButton.text = if (movie.isWatched) {
+                getString(R.string.mark_as_unwatched)
+            } else {
+                getString(R.string.mark_as_watched)
+            }
+        }
+    }
+
+    private fun showFavoriteMessage() {
+        val message = if (currentMovie?.isFavorite == true) {
+            getString(R.string.add_to_favorites)
+        } else {
+            getString(R.string.remove_from_favorites)
+        }
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showWatchedMessage() {
+        val message = if (currentMovie?.isWatched == true) {
+            getString(R.string.marked_watched)
+        } else {
+            getString(R.string.marked_unwatched)
+        }
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun bindMovieDetails(movie: Movie) {

@@ -59,4 +59,11 @@ class MovieViewModel @Inject constructor(
         }
     }
 
+    fun toggleWatched(movie: Movie) {
+        viewModelScope.launch {
+            repository.toggleWatched(movie)
+            _movieDetails.value = movie.copy(isWatched = !movie.isWatched)
+        }
+    }
+
 }
