@@ -6,4 +6,7 @@
     <string name="mark_as_unwatched">Marcar como no vista</string>
     <string name="marked_watched">Película marcada como vista</string>
     <string name="marked_unwatched">Película marcada como no vista</string>
+    <string name="tab_all">Todas</string>
+    <string name="tab_favorites">Favoritas</string>
+    <string name="tab_watched">Vistas</string>
 </resources>

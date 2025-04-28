@@ -23,6 +23,10 @@ class MovieRepository @Inject constructor(
         return movieDao.getFavoriteMovies().map { it.toDomainList() }
     }
 
+    fun getWatchedMovies(): Flow<List<Movie>> {
+        return movieDao.getWatchedMovies().map { it.toDomainList() }
+    }
+
     suspend fun toggleFavorite(movie: Movie) {
         val movieEntity = movie.toEntity().copy(isFavorite = !movie.isFavorite)
         movieDao.insertMovie(movieEntity)

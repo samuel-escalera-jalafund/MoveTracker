@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.movietracker.model.toDomain
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 
 @HiltViewModel
 class MovieViewModel @Inject constructor(
@@ -20,16 +23,53 @@ class MovieViewModel @Inject constructor(
     private val _searchResults = MutableLiveData<List<Movie>>()
     val searchResults: LiveData<List<Movie>> = _searchResults
 
+    private val currentTab = MutableStateFlow(0)
+
     private val _movieDetails = MutableLiveData<Movie?>()
     val movieDetails: LiveData<Movie?> = _movieDetails
 
+    private val _moviesToShow = MutableStateFlow<List<Movie>>(emptyList())
+    val moviesToShow: StateFlow<List<Movie>> = _moviesToShow
+
+
     fun searchMovies(query: String) {
         viewModelScope.launch {
-            _searchResults.value = repository.searchMovies(query)
+            if (currentTab.value == 0) {
+                _moviesToShow.value = repository.searchMovies(query)
+            }
+        }
+    }
+    val favoriteMovies: Flow<List<Movie>> = repository.getFavoriteMovies()
+
+    init {
+        viewModelScope.launch {
+            combine(
+                repository.getFavoriteMovies(),
+                repository.getWatchedMovies(),
+                currentTab
+            ) { favorites, watched, tab ->
+                when (tab) {
+                    1 -> favorites
+                    2 -> watched
+                    else -> emptyList()
+                }
+            }.collect { filteredMovies ->
+                _moviesToShow.value = filteredMovies
+            }
         }
     }
 
-    val favoriteMovies: Flow<List<Movie>> = repository.getFavoriteMovies()
+    fun showAllMovies() {
+        currentTab.value = 0
+    }
+
+    fun showFavoriteMovies() {
+        currentTab.value = 1
+    }
+
+    fun showWatchedMovies() {
+        currentTab.value = 2
+    }
 
     fun getMovieDetails(movieId: Int) {
         viewModelScope.launch {
