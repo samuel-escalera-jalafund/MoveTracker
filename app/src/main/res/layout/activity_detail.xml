@@ -37,7 +37,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Añadir a favoritos" />
+            android:text="Añadir a favoritos"
+            android:onClick="onFavoriteClick"/>
 
     </LinearLayout>
 </ScrollView>

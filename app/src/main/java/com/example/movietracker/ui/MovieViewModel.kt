@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.movietracker.model.toDomain
 
 @HiltViewModel
 class MovieViewModel @Inject constructor(
@@ -33,11 +34,29 @@ class MovieViewModel @Inject constructor(
     fun getMovieDetails(movieId: Int) {
         viewModelScope.launch {
             try {
-                val details = repository.getMovieDetails(movieId)
-                _movieDetails.value = details
+                val apiMovie = repository.getMovieDetails(movieId)
+                val localMovie = repository.getMovieById(movieId)
+
+                val combinedMovie = apiMovie.copy(
+                    isFavorite = localMovie?.isFavorite ?: false
+                )
+
+                _movieDetails.value = combinedMovie
             } catch (e: Exception) {
                 _movieDetails.value = null
             }
         }
     }
+
+    suspend fun getMovieById(movieId: Int): Movie? {
+        return repository.getMovieById(movieId)?.toDomain()
+    }
+
+    fun toggleFavorite(movie: Movie) {
+        viewModelScope.launch {
+            repository.toggleFavorite(movie)
+            _movieDetails.value = movie.copy(isFavorite = !movie.isFavorite)
+        }
+    }
+
 }

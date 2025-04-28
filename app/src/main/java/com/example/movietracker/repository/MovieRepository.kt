@@ -1,6 +1,7 @@
 package com.example.movietracker.repository
 
 import com.example.movietracker.data.local.MovieDao
+import com.example.movietracker.data.local.MovieEntity
 import com.example.movietracker.data.remote.MovieApiService
 import com.example.movietracker.model.toDomain
 import com.example.movietracker.model.toDomainList
@@ -23,12 +24,15 @@ class MovieRepository @Inject constructor(
     }
 
     suspend fun toggleFavorite(movie: Movie) {
-        movieDao.insertMovie(
-            movie.toEntity().copy(isFavorite = !movie.isFavorite)
-        )
+        val movieEntity = movie.toEntity().copy(isFavorite = !movie.isFavorite)
+        movieDao.insertMovie(movieEntity)
     }
 
     suspend fun getMovieDetails(movieId: Int): Movie {
         return apiService.getMovieDetails(movieId).toDomain()
+    }
+
+    suspend fun getMovieById(movieId: Int): MovieEntity? {
+        return movieDao.getMovieById(movieId)
     }
 }

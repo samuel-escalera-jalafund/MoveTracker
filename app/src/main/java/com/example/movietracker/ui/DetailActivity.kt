@@ -1,6 +1,7 @@
 package com.example.movietracker.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -13,6 +14,7 @@ class DetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailBinding
     private val viewModel: MovieViewModel by viewModels()
+    private var currentMovie: Movie? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,11 +28,29 @@ class DetailActivity : AppCompatActivity() {
         } else {
             finish()
         }
+
+        binding.favoriteButton.setOnClickListener {
+            currentMovie?.let { movie ->
+                viewModel.toggleFavorite(movie)
+                currentMovie = movie.copy(isFavorite = !movie.isFavorite)
+                updateFavoriteButton()
+                val message = if (currentMovie?.isFavorite == true) {
+                    "Película añadida a favoritos"
+                } else {
+                    "Película removida de favoritos"
+                }
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun observeViewModel() {
         viewModel.movieDetails.observe(this) { movie ->
-            movie?.let { bindMovieDetails(it) }
+            movie?.let {
+                currentMovie = it
+                bindMovieDetails(it)
+                updateFavoriteButton()
+            }
         }
     }
 
@@ -41,5 +61,16 @@ class DetailActivity : AppCompatActivity() {
         Glide.with(this)
             .load(movie.imageUrl)
             .into(binding.moviePoster)
+    }
+
+    private fun updateFavoriteButton() {
+        currentMovie?.let { movie ->
+            val buttonText = if (movie.isFavorite) {
+                "Quitar de favoritos"
+            } else {
+                "Añadir a favoritos"
+            }
+            binding.favoriteButton.text = buttonText
+        }
     }
 }
